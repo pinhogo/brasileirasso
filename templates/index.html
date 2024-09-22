@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentação da API Brasileirasso</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        pre {
+            background-color: #eee;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+        }
+        .toc {
+            margin-bottom: 20px;
+        }
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        .toc li {
+            margin: 5px 0;
+        }
+        .toc a {
+            text-decoration: none;
+            color: #007BFF;
+        }
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Documentação da API Brasileirasso</h1>
+        <p>Esta API permite gerenciar dados do campeonato Brasileirasso, armazenados no arquivo <code>brasileirasso_reformatado.json</code>. A API oferece diversas rotas para realizar operações de <strong>CRUD</strong> (Criar, Ler, Atualizar, Deletar) sobre os dados dos times por ano.</p>
+        
+        <div class="toc">
+            <h2>Índice</h2>
+            <ul>
+                <li><a href="#base-url">Base URL</a></li>
+                <li><a href="#rotas">Rotas</a>
+                    <ul>
+                        <li><a href="#1-rota-inicial">1. Rota Inicial (`/`)</a></li>
+                        <li><a href="#2-rota-de-ano">2. Rota de Ano (`/&lt;year&gt;`)</a></li>
+                        <li><a href="#3-rota-de-time-por-ano">3. Rota de Time por Ano (`/&lt;year&gt;/&lt;team&gt;`)</a></li>
+                        <li><a href="#4-rota-de-variavel-por-time-e-ano">4. Rota de Variável por Time e Ano (`/&lt;year&gt;/&lt;team&gt;/&lt;var&gt;`)</a></li>
+                        <li><a href="#5-rota-de-atributo-por-ano">5. Rota de Atributo por Ano (`/&lt;year&gt;/&lt;attribute&gt;`)</a></li>
+                        <li><a href="#6-rota-de-delecao-de-atributo">6. Rota de Deleção de Atributo (`/&lt;year&gt;/&lt;team&gt;/&lt;attribute&gt;`)</a></li>
+                    </ul>
+                </li>
+                <li><a href="#exemplos-de-requisicoes">Exemplos de Requisições</a>
+                    <ul>
+                        <li><a href="#adicionar-um-novo-ano">Adicionar um Novo Ano</a></li>
+                        <li><a href="#atualizar-dados-de-um-time">Atualizar Dados de um Time</a></li>
+                        <li><a href="#adicionar-um-novo-atributo-a-um-time">Adicionar um Novo Atributo a um Time</a></li>
+                    </ul>
+                </li>
+                <li><a href="#consideracoes-finais">Considerações Finais</a></li>
+            </ul>
+        </div>
+        
+        <h2 id="base-url">Base URL</h2>
+        <p>Assumindo que a aplicação Flask está rodando localmente na porta padrão, a Base URL será:</p>
+        <pre><code>http://localhost:5000</code></pre>
+        
+        <h2 id="rotas">Rotas</h2>
+        
+        <h3 id="1-rota-inicial">1. Rota Inicial (`/`)</h3>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>GET</code></li>
+            <li><strong>Descrição:</strong> Retorna a página de documentação da API.</li>
+            <li><strong>Endpoint Completo:</strong> <code>GET http://localhost:5000/</code></li>
+        </ul>
+        
+        <h3 id="2-rota-de-ano">2. Rota de Ano (`/&lt;year&gt;`)</h3>
+        
+        <h4>GET `/&lt;year&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>GET</code></li>
+            <li><strong>Descrição:</strong> Retorna os dados de um ano específico.</li>
+            <li><strong>Endpoint Completo:</strong> <code>GET http://localhost:5000/&lt;year&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                </ul>
+            </li>
+        </ul>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>{
+    "Time A": {
+        "position": 1,
+        "points": 60,
+        "games": 30,
+        "wins": 18,
+        "draws": 6,
+        "losses": 6,
+        "goals_sc": 50,
+        "goals_ag": 30,
+        "goals_diff": 20,
+        "perc_points": 66.67
+    },
+    "Time B": {
+        // Dados do Time B
+    }
+    // Outros times
+}</code></pre>
+        <p><strong>Resposta de Erro:</strong></p>
+        <pre><code>{
+    "error": "Ano não encontrado"
+}</code></pre>
+        
+        <h4>POST `/&lt;year&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>POST</code></li>
+            <li><strong>Descrição:</strong> Adiciona um novo ano à base de dados. O ano deve ser sequencial, ou seja, um a mais que o último ano existente.</li>
+            <li><strong>Endpoint Completo:</strong> <code>POST http://localhost:5000/&lt;year&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano a ser adicionado (exemplo: <code>2024</code>).</li>
+                </ul>
+            </li>
+        </ul>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>{
+    "message": "Ano 2024 adicionado com sucesso"
+}</code></pre>
+        <p><strong>Respostas de Erro:</strong></p>
+        <ol>
+            <li><strong>Ano não sequencial:</strong>
+                <pre><code>{
+    "error": "O ano deve ser um a mais que o último ano"
+}</code></pre>
+            </li>
+            <li><strong>Formato de ano inválido:</strong>
+                <pre><code>{
+    "error": "Formato de ano inválido"
+}</code></pre>
+            </li>
+        </ol>
+        
+        <h3 id="3-rota-de-time-por-ano">3. Rota de Time por Ano (`/&lt;year&gt;/&lt;team&gt;`)</h3>
+        
+        <h4>GET `/&lt;year&gt;/&lt;team&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>GET</code></li>
+            <li><strong>Descrição:</strong> Retorna os dados de um time específico em um determinado ano.</li>
+            <li><strong>Endpoint Completo:</strong> <code>GET http://localhost:5000/&lt;year&gt;/&lt;team&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                    <li><code>team</code> (string): Nome do time (exemplo: <code>Time A</code>).</li>
+                </ul>
+            </li>
+        </ul>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>{
+    "position": 1,
+    "points": 60,
+    "games": 30,
+    "wins": 18,
+    "draws": 6,
+    "losses": 6,
+    "goals_sc": 50,
+    "goals_ag": 30,
+    "goals_diff": 20,
+    "perc_points": 66.67
+}</code></pre>
+        <p><strong>Resposta de Erro:</strong></p>
+        <pre><code>{
+    "error": "Ano ou time não encontrado"
+}</code></pre>
+        
+        <h4>PATCH `/&lt;year&gt;/&lt;team&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>PATCH</code></li>
+            <li><strong>Descrição:</strong> Atualiza os dados de um time específico em um determinado ano. Apenas os campos fornecidos na requisição serão atualizados.</li>
+            <li><strong>Endpoint Completo:</strong> <code>PATCH http://localhost:5000/&lt;year&gt;/&lt;team&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                    <li><code>team</code> (string): Nome do time (exemplo: <code>Time A</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Corpo da Requisição:</strong> JSON com os campos a serem atualizados. Apenas os campos presentes no JSON serão modificados.</li>
+        </ul>
+        <p><strong>Exemplo de Corpo da Requisição:</strong></p>
+        <pre><code>{
+    "points": 65,
+    "wins": 20
+}</code></pre>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>Success</code></pre>
+        <p><strong>Respostas de Erro:</strong></p>
+        <ol>
+            <li><strong>Nenhum dado fornecido:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Nenhum dado fornecido"
+}</code></pre>
+            </li>
+            <li><strong>Ano ou time não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Ano ou time não encontrado"
+}</code></pre>
+            </li>
+        </ol>
+        
+        <h3 id="4-rota-de-variavel-por-time-e-ano">4. Rota de Variável por Time e Ano (`/&lt;year&gt;/&lt;team&gt;/&lt;var&gt;`)</h3>
+        
+        <h4>PUT `/&lt;year&gt;/&lt;team&gt;/&lt;var&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>PUT</code></li>
+            <li><strong>Descrição:</strong> Adiciona uma nova variável (`var`) a um time específico em um determinado ano. Se a variável já existir, não será adicionada novamente.</li>
+            <li><strong>Endpoint Completo:</strong> <code>PUT http://localhost:5000/&lt;year&gt;/&lt;team&gt;/&lt;var&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                    <li><code>team</code> (string): Nome do time (exemplo: <code>Time A</code>).</li>
+                    <li><code>var</code> (string): Nome da variável a ser adicionada (exemplo: <code>title</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Corpo da Requisição:</strong> JSON contendo o valor da nova variável.</li>
+        </ul>
+        <p><strong>Exemplo de Corpo da Requisição:</strong></p>
+        <pre><code>{
+    "title": "Campeão"
+}</code></pre>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>Success</code></pre>
+        <p><strong>Respostas de Erro:</strong></p>
+        <ol>
+            <li><strong>Ano não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Ano não encontrado"
+}</code></pre>
+            </li>
+            <li><strong>Time não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Time não encontrado"
+}</code></pre>
+            </li>
+        </ol>
+        
+        <h3 id="5-rota-de-atributo-por-ano">5. Rota de Atributo por Ano (`/&lt;year&gt;/&lt;attribute&gt;`)</h3>
+        
+        <h4>POST `/&lt;year&gt;/&lt;attribute&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>POST</code></li>
+            <li><strong>Descrição:</strong> Insere um novo atributo para todos os times de um determinado ano. Se o atributo já existir, seu valor será atualizado.</li>
+            <li><strong>Endpoint Completo:</strong> <code>POST http://localhost:5000/&lt;year&gt;/&lt;attribute&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                    <li><code>attribute</code> (string): Nome do atributo a ser inserido (exemplo: <code>stadium</code>).</li>
+                </ul>
+            </li>
+            <li><strong>Corpo da Requisição:</strong> JSON contendo o valor do atributo.</li>
+        </ul>
+        <p><strong>Exemplo de Corpo da Requisição:</strong></p>
+        <pre><code>{
+    "stadium": "Estádio Nacional"
+}</code></pre>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>Success</code></pre>
+        <p><strong>Resposta de Erro:</strong></p>
+        <pre><code>Ao não encontrar o ano
+Ano não encontrado
+}</code></pre>
+        
+        <h3 id="6-rota-de-delecao-de-atributo">6. Rota de Deleção de Atributo (`/&lt;year&gt;/&lt;team&gt;/&lt;attribute&gt;`)</h3>
+        
+        <h4>DELETE `/&lt;year&gt;/&lt;team&gt;/&lt;attribute&gt;`</h4>
+        <ul>
+            <li><strong>Método HTTP:</strong> <code>DELETE</code></li>
+            <li><strong>Descrição:</strong> Remove um atributo específico de um time em um determinado ano.</li>
+            <li><strong>Endpoint Completo:</strong> <code>DELETE http://localhost:5000/&lt;year&gt;/&lt;team&gt;/&lt;attribute&gt;</code></li>
+            <li><strong>Parâmetros de URL:</strong>
+                <ul>
+                    <li><code>year</code> (string): Ano desejado (exemplo: <code>2023</code>).</li>
+                    <li><code>team</code> (string): Nome do time (exemplo: <code>Time A</code>).</li>
+                    <li><code>attribute</code> (string): Nome do atributo a ser removido (exemplo: <code>goals_diff</code>).</li>
+                </ul>
+            </li>
+        </ul>
+        <p><strong>Resposta de Sucesso:</strong></p>
+        <pre><code>Success</code></pre>
+        <p><strong>Respostas de Erro:</strong></p>
+        <ol>
+            <li><strong>Ano não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Ano '2023' não encontrado"
+}</code></pre>
+            </li>
+            <li><strong>Time não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Time 'Time A' não encontrado para o ano '2023'"
+}</code></pre>
+            </li>
+            <li><strong>Atributo não encontrado:</strong>
+                <pre><code>{
+    "status": "error",
+    "message": "Atributo 'goals_diff' não encontrado para o time 'Time A'"
+}</code></pre>
+            </li>
+        </ol>
+        
+        <h2 id="exemplos-de-requisicoes">Exemplos de Requisições</h2>
+        
+        <h3 id="adicionar-um-novo-ano">Adicionar um Novo Ano</h3>
+        <p><strong>Descrição:</strong> Adiciona o ano <code>2024</code> à base de dados.</p>
+        <ul>
+            <li><strong>Método:</strong> <code>POST</code></li>
+            <li><strong>Endpoint:</strong> <code>http://localhost:5000/2024</code></li>
+            <li><strong>Corpo da Requisição:</strong> <em>Nenhum corpo necessário</em></li>
+        </ul>
+        <p><strong>Requisição no Postman:</strong></p>
+        <ol>
+            <li>Selecione o método <code>POST</code>.</li>
+            <li>Insira a URL: <code>http://localhost:5000/2024</code>.</li>
+            <li>Clique em <strong>Send</strong>.</li>
+        </ol>
+        <p><strong>Resposta Esperada:</strong></p>
+        <pre><code>{
+    "message": "Ano 2024 adicionado com sucesso"
+}</code></pre>
+        
+        <h3 id="atualizar-dados-de-um-time">Atualizar Dados de um Time</h3>
+        <p><strong>Descrição:</strong> Atualiza os pontos e vitórias do <code>Time A</code> no ano <code>2023</code>.</p>
+        <ul>
+            <li><strong>Método:</strong> <code>PATCH</code></li>
+            <li><strong>Endpoint:</strong> <code>http://localhost:5000/2023/Time%20A</code></li>
+            <li><strong>Parâmetros de URL:</strong> <em>Certifique-se de codificar espaços e caracteres especiais na URL. Por exemplo, <code>Time A</code> deve ser codificado como <code>Time%20A</code>.</em></li>
+            <li><strong>Corpo da Requisição:</strong></li>
+        </ul>
+        <pre><code>{
+    "points": 65,
+    "wins": 20
+}</code></pre>
+        <p><strong>Requisição no Postman:</strong></p>
+        <ol>
+            <li>Selecione o método <code>PATCH</code>.</li>
+            <li>Insira a URL: <code>http://localhost:5000/2023/Time%20A</code>.</li>
+            <li>Vá para a aba <strong>Body</strong>.</li>
+            <li>Selecione <strong>raw</strong> e escolha o formato <strong>JSON</strong>.</li>
+            <li>Insira o JSON acima.</li>
+            <li>Clique em <strong>Send</strong>.</li>
+        </ol>
+        <p><strong>Resposta Esperada:</strong></p>
+        <pre><code>Success</code></pre>
+        
+        <h3 id="adicionar-um-novo-atributo-a-um-time">Adicionar um Novo Atributo a um Time</h3>
+        <p><strong>Descrição:</strong> Adiciona o atributo <code>title</code> com o valor <code>"Campeão"</code> ao <code>Time A</code> no ano <code>2023</code>.</p>
+        <ul>
+            <li><strong>Método:</strong> <code>PUT</code></li>
+            <li><strong>Endpoint:</strong> <code>http://localhost:5000/2023/Time%20A/title</code></li>
+            <li><strong>Corpo da Requisição:</strong></li>
+        </ul>
+        <pre><code>{
+    "title": "Campeão"
+}</code></pre>
+        <p><strong>Requisição no Postman:</strong></p>
+        <ol>
+            <li>Selecione o método <code>PUT</code>.</li>
+            <li>Insira a URL: <code>http://localhost:5000/2023/Time%20A/title</code>.</li>
+            <li>Vá para a aba <strong>Body</strong>.</li>
+            <li>Selecione <strong>raw</strong> e escolha o formato <strong>JSON</strong>.</li>
+            <li>Insira o JSON acima.</li>
+            <li>Clique em <strong>Send</strong>.</li>
+        </ol>
+        <p><strong>Resposta Esperada:</strong></p>
+        <pre><code>Success</code></pre>
+        
+        <h2 id="consideracoes-finais">Considerações Finais</h2>
+        <ul>
+            <li><strong>Validação de Dados:</strong> Certifique-se de que os dados fornecidos nas requisições estão no formato correto e que os parâmetros de URL são válidos para evitar erros.</li>
+            <li><strong>Codificação de URLs:</strong> Quando utilizar nomes de times ou atributos com espaços ou caracteres especiais, lembre-se de codificá-los corretamente na URL (por exemplo, substituir espaços por <code>%20</code>).</li>
+            <li><strong>Manutenção da Base de Dados:</strong> Todas as operações de escrita (<code>POST</code>, <code>PATCH</code>, <code>PUT</code>, <code>DELETE</code>) modificam o arquivo <code>brasileirasso_reformatado.json</code>. É recomendado fazer backups periódicos deste arquivo para evitar perda de dados.</li>
+            <li><strong>Segurança:</strong> Considere implementar autenticação e autorização se a API for exposta publicamente para proteger os dados contra acessos não autorizados.</li>
+            <li><strong>Escalabilidade:</strong> Para aplicações com grande volume de dados ou alta frequência de acessos, considere migrar para um banco de dados relacional ou NoSQL, ao invés de utilizar arquivos JSON.</li>
+        </ul>
+    </div>
+</body>
+</html>
