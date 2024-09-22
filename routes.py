@@ -16,7 +16,7 @@ def start():
     return render_template('index.html')
 
 @app.route('/<string:year>', methods=['GET', 'POST', 'DELETE'])
-@require_api_key(['POST'])
+@require_api_key(['POST', 'DELETE'])
 def tableyear(year):
         if request.method == 'GET':
             for yearjs, data_year in brasileirasso.items():
