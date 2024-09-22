@@ -43,32 +43,14 @@ def tableyear(year):
             with open(dados, 'w', encoding='utf-8') as f:
                 json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
             return jsonify({"message": f"Year {year} added successfully"}), 201
-        
         elif request.method == 'DELETE':
-        # Implementar a lógica para deletar o ano, se for o mais antigo
-        if not brasileirasso:
-            return jsonify({"error": "No years available to delete"}), 400
-
-        # Encontrar o ano mais antigo
-        oldest_year = min(int(y) for y in brasileirasso.keys())
-        oldest_year_str = str(oldest_year)
-
-        if year != oldest_year_str:
-            return jsonify({"error": f"Only the oldest year ({oldest_year_str}) can be deleted"}), 403
-
-        # Deletar o ano
-        del brasileirasso[year]
-
-        # Salvar as alterações no arquivo JSON
-        with open(dados, 'w', encoding='utf-8') as f:
-            json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
-
-        return jsonify({"message": f"Year {year} deleted successfully"}), 200
-    else:
-        return jsonify({"error": "Invalid method"}), 400
-
-        else:
-            return jsonify({"error": "Year must be one greater than the last year"}), 400
+            if year in brasileirasso:
+                del brasileirasso[year]
+                with open(dados, 'w', encoding='utf-8') as f:
+                    json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
+                return jsonify({"message": f"Year {year} deleted successfully"}), 200
+            else:
+                return jsonify({"error": "Year not found"}), 404
         
 @app.route('/<string:year>/<string:team>', methods=['GET'])
 def get_time(year, team):
