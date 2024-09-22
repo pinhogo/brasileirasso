@@ -1,8 +1,10 @@
 from main import app
 from flask import Response, jsonify, request, render_template
+from functools import wraps
 import json
 from dotmap import DotMap
 from collections import OrderedDict
+from security import require_api_key 
 
 dados = 'brasileirasso.json'
 with open(dados, 'r', encoding='utf-8') as f:
@@ -13,7 +15,8 @@ brasileirasso = DotMap(dados_json)
 def start():
     return render_template('index.html')
 
-@app.route('/<string:year>', methods=['GET', 'POST']) 
+@app.route('/<string:year>', methods=['GET', 'POST'])
+@require_api_key(['POST'])
 def tableyear(year):
         if request.method == 'GET':
             for yearjs, data_year in brasileirasso.items():
@@ -52,6 +55,7 @@ def get_time(year, team):
         return jsonify({"error": "Ano ou time não encontrado"}), 404
     
 @app.route('/<string:year>/<string:team>', methods=['PATCH'])
+@require_api_key(['PATCH'])
 def update_data(year, team):
     put_json = request.get_json()
     print(put_json)
@@ -74,6 +78,7 @@ def update_data(year, team):
         return "Sucess", 200
     
 @app.route('/<string:year>/<string:team>/<string:var>', methods=['PUT'])
+@require_api_key(['PUT'])
 def append_data(year, team, var):
     put_json = request.get_json()
     print(put_json)
@@ -94,6 +99,7 @@ def append_data(year, team, var):
     return "Sucess", 200
 
 @app.route('/<string:year>/<string:atribute>', methods=['POST'])
+@require_api_key(['POST'])
 def insert_atribute(year, atribute):
     put_json = request.get_json()
     print(put_json)
@@ -109,6 +115,7 @@ def insert_atribute(year, atribute):
     return "Sucess", 200
 
 @app.route('/<string:year>/<string:team>/<string:atribute>', methods=['DELETE'])
+@require_api_key(['DELETE'])
 def delete_atribute(year, team, atribute):
 
     if year in brasileirasso:

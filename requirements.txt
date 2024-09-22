@@ -8,3 +8,4 @@ MarkupSafe==2.1.5
 setuptools==72.1.0
 Werkzeug==3.0.4
 wheel==0.44.0
+python-dotenv==1.0.1
