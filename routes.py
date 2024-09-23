@@ -18,39 +18,41 @@ def start():
 @app.route('/<string:year>', methods=['GET', 'POST', 'DELETE'])
 @require_api_key(['POST', 'DELETE'])
 def tableyear(year):
-        if request.method == 'GET':
-            for yearjs, data_year in brasileirasso.items():
-                if yearjs == year:
-                    response = Response(json.dumps(data_year.toDict(), ensure_ascii=False), content_type='application/json; charset=utf-8')
-                    return response
-        elif request.method == 'POST':
-            max_year = max(int(y) for y in brasileirasso.keys())
-            if int(year) == max_year + 1:
-                last_year_data = brasileirasso[str(max_year)]
-                new_year_data = {team: {
-                    'position': None,
-                    'points': None,
-                    'games': None,
-                    'wins': None,
-                    'draws': None,
-                    'losses': None,
-                    'goals_sc': None,
-                    'goals_ag': None,
-                    'goals_diff': None,
-                    'perc_points': None
+    if request.method == 'GET':
+        for yearjs, data_year in brasileirasso.items():
+            if yearjs == year:
+                response = Response(json.dumps(data_year.toDict(), ensure_ascii=False), content_type='application/json; charset=utf-8')
+                return response
+    elif request.method == 'POST':
+        max_year = max(int(y) for y in brasileirasso.keys())
+        if int(year) == max_year + 1:
+            last_year_data = brasileirasso[str(max_year)]
+            new_year_data = {team: {
+                'position': None,
+                'points': None,
+                'games': None,
+                'wins': None,
+                'draws': None,
+                'losses': None,
+                'goals_sc': None,
+                'goals_ag': None,
+                'goals_diff': None,
+                'perc_points': None
             } for team in last_year_data.keys()}
             brasileirasso[str(year)] = new_year_data
             with open(dados, 'w', encoding='utf-8') as f:
                 json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
             return jsonify({"message": f"Year {year} added successfully"}), 201
-        elif request.method == 'DELETE':
-            if year in brasileirasso:
-                del brasileirasso[year]
-                with open(dados, 'w', encoding='utf-8') as f:
-                    json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
-                return jsonify({"message": f"Year {year} deleted successfully"}), 200
-            else:
-                return jsonify({"error": "Year not found"}), 404
+        else:
+            return jsonify({"error": "error: Year must be sequential, one more than the last existing year."}), 400
+    elif request.method == 'DELETE':
+        if year in brasileirasso:
+            del brasileirasso[year]
+            with open(dados, 'w', encoding='utf-8') as f:
+                json.dump(brasileirasso.toDict(), f, ensure_ascii=False, indent=4)
+            return jsonify({"message": f"Year {year} deleted successfully"}), 200
+        else:
+            return jsonify({"error": "Year not found"}), 404
         
 @app.route('/<string:year>/<string:team>', methods=['GET'])
 def get_time(year, team):
